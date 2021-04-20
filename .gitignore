@@ -1,0 +1,14 @@
+# Directories content
+/project/*
+!/project/.gitkeep
+/data/*
+!/data/.gitkeep
+
+# Vagrant files
+.vagrant/
+
+# Mac OS files
+.DS_Store
+
+# PHPStorm files
+.idea

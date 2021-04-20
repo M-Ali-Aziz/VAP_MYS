@@ -1,0 +1,83 @@
+---
+- name: Install Apache web server
+  become: yes
+  apt:
+    name:
+      - apache2
+    state: present
+  notify: Restart Apache
+  tags:
+    - apache2
+
+- name: Enable rewrite module
+  become: yes
+  apache2_module:
+    name: rewrite
+    state: present
+  notify: Restart Apache
+  tags:
+    - apache2
+
+- name: Enable vhost_alias module
+  become: yes
+  apache2_module:
+    name: vhost_alias
+    state: present
+  notify: Restart Apache
+  tags:
+    - apache2
+
+- name: Add vagrant user to www-data group
+  become: yes
+  user:
+    name: vagrant
+    group: www-data
+    shell: /bin/bash
+  tags:
+    - apache2
+
+- name: Add Pimcore vhost config template to the Apache available sites
+  become: yes
+  template:
+    src: templates/{{ vhost_template_name }}.conf
+    dest: /etc/apache2/sites-available/{{ vhost_template_name }}.conf
+  notify: Restart Apache
+  tags:
+    - apache2
+    - vhost
+
+- name: Enable Pimcore config template from Apache available sites
+  become: yes
+  file:
+    src: /etc/apache2/sites-available/{{ vhost_template_name }}.conf
+    path: /etc/apache2/sites-enabled/{{ vhost_template_name }}.conf
+    state: link
+  notify: Restart Apache
+  tags:
+    - apache2
+    - vhost
+
+- name: Check that {{ vhost_template_name }}.conf is valid
+  become: yes
+  command: apache2ctl configtest
+  register: check_vhost_valid
+  changed_when: check_vhost_valid.stderr != "Syntax OK"
+  tags:
+    - apache2
+    - vhost
+
+#- name: Disable the default virtualhost
+#  become: yes
+#  command: a2dissite 000-default
+#  register: disable_vhost_default
+#  changed_when: not disable_vhost_default.stdout is search('already disabled')
+#  notify: Restart Apache
+#  tags:
+#    - apache2
+#    - vhost
+
+#
+# - debug:
+#     var: disable_vhost_default
+#   tags:
+#     - vhost

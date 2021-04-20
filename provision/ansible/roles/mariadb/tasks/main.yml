@@ -1,0 +1,74 @@
+---
+- name: Install MariaDB server
+  become: yes
+  apt:
+    name:
+      - mariadb-server
+    state: latest
+  tags:
+    - mariadb
+
+- name: Install required MariaDB Python libraries
+  become: yes
+  apt:
+    name:
+      - python3-mysqldb
+    state: latest
+  tags:
+    - mariadb
+
+- name: Determine required MariaDB Python libraries.
+  set_fact:
+    deb_mysql_python_package: "{% if 'python3' in ansible_python_interpreter|default('') %}python3-mysqldb{% else %}python-mysqldb{% endif %}"
+  tags:
+    - mariadb
+
+- name: Set innodb_large_prefix variable to ON
+  become: yes
+  mysql_variables:
+    variable: innodb_large_prefix
+    value: "ON"
+  tags:
+    - mariadb
+
+- name: Set innodb_file_format variable to Barracuda
+  become: yes
+  mysql_variables:
+    variable: innodb_file_format
+    value: "Barracuda"
+  tags:
+    - mariadb
+
+#- name: Edit database root user plugin from auth_socket to mysql_native_password
+#  become: yes
+#  mysql_user:
+#    name: root
+#    password: "{{ mysql_root_password }}"
+#    priv: "*.*:ALL,GRANT"
+#    host: "%"
+##  failed_when: no
+#  tags:
+#    - mariadb
+
+- name: Create a new database
+  become: yes
+  mysql_db:
+    #    login_user: root
+    #    login_password: "{{ mysql_root_password }}"
+    name: "{{ mysql_database_name }}"
+    encoding: "{{ mysql_encoding }}"
+    collation: "{{ mysql_collation }}"
+  tags:
+    - mariadb
+
+- name: Create new database-user with all database privileges and 'WITH GRANT OPTION'
+  become: yes
+  mysql_user:
+    #    login_user: root
+    #    login_password: "{{ mysql_root_password }}"
+    name: "{{ mysql_user }}"
+    password: "{{ mysql_password }}"
+    priv: "*.*:ALL,GRANT"
+    host: "localhost"
+  tags:
+    - mariadb
