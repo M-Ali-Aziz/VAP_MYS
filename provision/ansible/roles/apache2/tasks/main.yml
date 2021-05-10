@@ -9,6 +9,14 @@
   tags:
     - apache2
 
+- name: Start Apache
+  become: yes
+  service:
+    name: apache2
+    state: started
+  tags:
+    - apache2
+
 - name: Enable rewrite module
   become: yes
   apache2_module:
