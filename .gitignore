@@ -3,6 +3,7 @@
 !/project/.gitkeep
 /data/*
 !/data/.gitkeep
+/backup/
 
 # Vagrant files
 .vagrant/
