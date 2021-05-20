@@ -1,17 +1,18 @@
 ---
-- name: Install Apache web server
+- name: Install Apache2 web server
   become: yes
   apt:
     name:
       - apache2
     state: present
-  notify: Restart Apache
+  notify: Restart Apache2
   tags:
     - apache2
 
-- name: Start Apache
+- name: Start Apache2
   become: yes
   service:
+    enabled: yes
     name: apache2
     state: started
   tags:
@@ -20,18 +21,13 @@
 - name: Enable rewrite module
   become: yes
   apache2_module:
-    name: rewrite
+    name: "{{ item }}"
     state: present
-  notify: Restart Apache
-  tags:
-    - apache2
-
-- name: Enable vhost_alias module
-  become: yes
-  apache2_module:
-    name: vhost_alias
-    state: present
-  notify: Restart Apache
+  with_items:
+    - rewrite
+    - vhost_alias
+    - ssl
+  notify: Restart Apache2
   tags:
     - apache2
 
@@ -49,7 +45,7 @@
   template:
     src: templates/{{ vhost_template_name }}.conf
     dest: /etc/apache2/sites-available/{{ vhost_template_name }}.conf
-  notify: Restart Apache
+  notify: Restart Apache2
   tags:
     - apache2
     - vhost
@@ -60,7 +56,7 @@
     src: /etc/apache2/sites-available/{{ vhost_template_name }}.conf
     path: /etc/apache2/sites-enabled/{{ vhost_template_name }}.conf
     state: link
-  notify: Restart Apache
+  notify: Restart Apache2
   tags:
     - apache2
     - vhost
@@ -69,7 +65,7 @@
   become: yes
   command: apache2ctl configtest
   register: check_vhost_valid
-  changed_when: check_vhost_valid.stderr != "Syntax OK"
+  changed_when: not check_vhost_valid.stderr is search('Syntax OK')
   tags:
     - apache2
     - vhost
@@ -79,13 +75,12 @@
 #  command: a2dissite 000-default
 #  register: disable_vhost_default
 #  changed_when: not disable_vhost_default.stdout is search('already disabled')
-#  notify: Restart Apache
+#  notify: Restart Apache2
 #  tags:
 #    - apache2
 #    - vhost
 
-#
-# - debug:
-#     var: disable_vhost_default
-#   tags:
-#     - vhost
+#- debug:
+#    var: check_vhost_valid
+#  tags:
+#    - vhost

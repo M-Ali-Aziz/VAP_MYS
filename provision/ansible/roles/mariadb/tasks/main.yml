@@ -19,38 +19,50 @@
 
 - name: Determine required MariaDB Python libraries.
   set_fact:
-    deb_mysql_python_package: "{% if 'python3' in ansible_python_interpreter|default('') %}python3-mysqldb{% else %}python-mysqldb{% endif %}"
+    deb_mysql_python_package: "python3-mysqldb"
   tags:
     - mariadb
 
-- name: Set innodb_... variables
+#- name: Edit database root user plugin from auth_socket to mysql_native_password
+#  become: yes
+#  mysql_user:
+##    login_user: root
+##    login_password: "{{ mysql_root_password }}"
+#    name: root
+#    password: "{{ mysql_root_password }}"
+#    priv: "*.*:ALL,GRANT"
+#    host: "%"
+##  failed_when: no
+#  tags:
+#    - mariadb
+
+- name: Set innodb_file_per_table variable
   become: yes
   mysql_variables:
-    variable: "{{ item.variable }}"
-    value: "{{ item.value }}"
-  with_items:
-    - {variable: innodb_large_prefix, value: "ON"}
-    - {variable: innodb_file_format, value: "Barracuda"}
-    - {variable: innodb_file_per_table, value: "ON"}
+#    login_user: root
+#    login_password: "{{ mysql_root_password }}"
+    variable: innodb_file_per_table
+    value: "ON"
   tags:
     - mariadb
 
-- name: Edit database root user plugin from auth_socket to mysql_native_password
-  become: yes
-  mysql_user:
-    name: root
-    password: "{{ mysql_root_password }}"
-    priv: "*.*:ALL,GRANT"
-    host: "%"
-#  failed_when: no
-  tags:
-    - mariadb
+#- name: Set innodb_... variables
+#  become: yes
+#  mysql_variables:
+#    variable: "{{ item.variable }}"
+#    value: "{{ item.value }}"
+#  with_items:
+##    - {variable: innodb_file_format, value: "Barracuda"}
+#    - {variable: innodb_file_per_table, value: "ON"}
+##    - {variable: innodb_large_prefix, value: "ON"}
+#  tags:
+#    - mariadb
 
 - name: Create a new database
   become: yes
   mysql_db:
-    login_user: root
-    login_password: "{{ mysql_root_password }}"
+#    login_user: root
+#    login_password: "{{ mysql_root_password }}"
     name: "{{ mysql_database_name }}"
     encoding: "{{ mysql_encoding }}"
     collation: "{{ mysql_collation }}"
@@ -60,11 +72,11 @@
 - name: Create new database-user with all database privileges and 'WITH GRANT OPTION'
   become: yes
   mysql_user:
-    login_user: root
-    login_password: "{{ mysql_root_password }}"
+#    login_user: root
+#    login_password: "{{ mysql_root_password }}"
     name: "{{ mysql_user }}"
     password: "{{ mysql_password }}"
     priv: "*.*:ALL,GRANT"
-    host: "localhost"
+    host: "%"
   tags:
     - mariadb

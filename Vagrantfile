@@ -2,18 +2,18 @@
 # vi: set ft=ruby :
 
 #============================= VARIABLES =================================
-# BOX use Ubuntu 18.04 LTS 64 bit
-BOX = "geerlingguy/ubuntu1804"
+# BOX use Ubuntu 20.04 LTS 64 bit
+BOX = "ubuntu/focal64"
 
 # Private network ip number
-IP = "10.1.0.10"
+IP = "10.0.0.11"
 
 # Shared folder to the guest VM
 HOST_FOLDER_PROJECT = "project"
 GUEST_FOLDER_PROJECT = "/var/www/project"
 
 # Customize VB
-VB_NAME = "mys_vagrant"
+VB_NAME = "ubuntu20_mys_vagrant"
 MEMORY = 5000
 CPU = 5
 
@@ -67,8 +67,9 @@ Vagrant.configure("2") do |config|
   # the path on the guest to mount the folder. And the optional third
   # argument is a set of non-required options.
   # config.vm.synced_folder "host_machine/", "/guest/machine"
-  config.vm.synced_folder HOST_FOLDER_PROJECT, GUEST_FOLDER_PROJECT, type: "nfs", mount_options: ['actimeo=2']
-#   config.vm.synced_folder HOST_FOLDER_PROJECT, GUEST_FOLDER_PROJECT, owner: "www-data", group: "www-data", mount_options:['dmode=775', 'fmode=775']
+  config.vm.synced_folder HOST_FOLDER_PROJECT, GUEST_FOLDER_PROJECT, owner: "www-data", group: "vagrant", mount_options:['dmode=777', 'fmode=777']
+#   config.vm.synced_folder HOST_FOLDER_PROJECT, GUEST_FOLDER_PROJECT, owner: "www-data", group: "www-data", mount_options:['dmode=777', 'fmode=777']
+  # config.vm.synced_folder HOST_FOLDER_PROJECT, GUEST_FOLDER_PROJECT, type: "nfs", mount_options: ['actimeo=2']
   # config.vm.synced_folder ".", "/vagrant", disabled: true
 
   # Provider-specific configuration so you can fine-tune various
@@ -95,7 +96,7 @@ Vagrant.configure("2") do |config|
   # Run Ansible from the Vagrant VM
   config.vm.provision :ansible_local do |ansible|
     ansible.playbook = ANSIBLE_PLAYBOOK_PATH
-    ansible.extra_vars = { ansible_python_interpreter: "/usr/bin/python3" }
+#     ansible.extra_vars = { ansible_python_interpreter: "/usr/bin/python3" }
 #     ansible.install_mode = "pip"
 #     ansible.pip_install_cmd = "sudo apt-get install -y python3-distutils && curl -s https://bootstrap.pypa.io/get-pip.py | sudo python3"
 #     ansible.version = "latest"
