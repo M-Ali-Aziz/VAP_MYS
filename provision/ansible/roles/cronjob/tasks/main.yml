@@ -1,0 +1,21 @@
+---
+- name: Creates cron file under /etc/cron.d
+  become: yes
+  cron:
+    name: "{{ item.name }}"
+    minute: "*"
+    hour: "*"
+    weekday: "*"
+    day: "*"
+    month: "*"
+    user: www-data
+    job: "{{ item.job }}"
+  with_items:
+    - { name: "Pimcore maintenance", job: "/var/www/project/mys/bin/console maintenance -v --ansi --ignore-maintenance-mode" }
+    - { name: "Segment Building Queue (CMF)", job: "/var/www/project/mys/bin/console cmf:build-segments -v > /var/www/project/mys/var/log/cmf-build-segments-queue-lastrun.log" }
+    - { name: "Action trigger queue (CMF)", job: "/var/www/project/mys/bin/console cmf:process-actiontrigger-queue -v > /var/www/project/mys/var/log/cmf-process-actiontrigger-queue-lastrun.log" }
+    - { name: "Cron Trigger (CMF)", job: "/var/www/project/mys/bin/console cmf:handle-cron-triggers -v > /var/www/project/mys/var/log/cmf-cron-trigger-lastrun.log" }
+    - { name: "Calculate potential duplicates (CMF)", job: "/var/www/project/mys/bin/console cmf:duplicates-index -c -v > /var/www/project/mys/var/log/cmf-potential-duplicates-lastrun.log" }
+    - { name: "CMF Maintenance (CMF)", job: "/var/www/project/mys/bin/console cmf:maintenance -v > /var/www/project/mys/var/log/cmf-cron-maintenance-lastrun.log" }
+  tags:
+    - cronjob

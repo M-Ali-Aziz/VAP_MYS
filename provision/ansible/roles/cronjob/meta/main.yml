@@ -1,0 +1,6 @@
+---
+dependencies:
+  - role: common
+  - role: apache2
+  - role: mariadb
+  - role: php8.0

@@ -18,3 +18,4 @@
       - mariadb
       - php8.0
       - composer
+      - cronjob
