@@ -1,0 +1,32 @@
+### --------------------
+# PIMCORE CronJobs (START)
+### --------------------
+### help -> $ sudo tail -f /var/log/syslog | fgrep CRON
+
+# Maintenance Cron Job
+* * * * * sudo -u www-data /var/www/project/mys/bin/console maintenance -v --ansi --ignore-maintenance-mode
+#
+# Segment Building Queue (CMF)
+* * * * * sudo -u www-data /var/www/project/mys/bin/console cmf:build-segments -v > /var/www/project/mys/var/log/cmf-build-segments-queue-lastrun.log
+#
+# Action trigger queue (CMF)
+* * * * * sudo -u www-data /var/www/project/mys/bin/console cmf:process-actiontrigger-queue -v > /var/www/project/mys/var/log/cmf-process-actiontrigger-queue-lastrun.log
+#
+# Cron Trigger (CMF)
+* * * * * sudo -u www-data /var/www/project/mys/bin/console cmf:handle-cron-triggers -v > /var/www/project/mys/var/log/cmf-cron-trigger-lastrun.log
+#
+# Calculate potential duplicates (CMF)
+* * * * * sudo -u www-data /var/www/project/mys/bin/console cmf:duplicates-index -c -v > /var/www/project/mys/var/log/cmf-potential-duplicates-lastrun.log
+#
+# CMF Maintenance (CMF)
+* * * * * sudo -u www-data /var/www/project/mys/bin/console cmf:maintenance -v > /var/www/project/mys/var/log/cmf-cron-maintenance-lastrun.log
+#
+# Newsletter Queue (CMF)
+* * * * * sudo -u www-data /var/www/project/mys/bin/console cmf:newsletter-sync -c > /var/www/project/mys/var/log/cmf-newsletter-sync-lastrun.log
+#
+# Mailchimp status sync (CMF)
+* * * * * sudo -u www-data /var/www/project/mys/bin/console cmf:newsletter-sync -m > /var/www/project/mys/var/log/cmf-mailchimp-status-sync-lastrun.log
+### --------------------
+# PIMCORE CronJobs (END)
+### --------------------
+#

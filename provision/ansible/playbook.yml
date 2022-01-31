@@ -16,6 +16,6 @@
       - common
       - apache2
       - mariadb
-      - php8.0
+      - php8.x
       - composer
       - cronjob

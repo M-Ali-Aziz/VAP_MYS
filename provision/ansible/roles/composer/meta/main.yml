@@ -1,4 +1,4 @@
 ---
 dependencies:
     - role: common
-    - role: php8.0
+    - role: php8.x

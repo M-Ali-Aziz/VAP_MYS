@@ -6,14 +6,14 @@
 BOX = "ubuntu/focal64"
 
 # Private network ip number
-IP = "10.0.0.11"
+IP = "10.0.0.12"
 
 # Shared folder to the guest VM
 HOST_FOLDER_PROJECT = "project"
 GUEST_FOLDER_PROJECT = "/var/www/project"
 
 # Customize VB
-VB_NAME = "ubuntu20_mys_vagrant"
+VB_NAME = "bitnami-ubuntu20_vagrant"
 MEMORY = 5000
 CPU = 5
 
@@ -67,8 +67,8 @@ Vagrant.configure("2") do |config|
   # the path on the guest to mount the folder. And the optional third
   # argument is a set of non-required options.
   # config.vm.synced_folder "host_machine/", "/guest/machine"
-  config.vm.synced_folder HOST_FOLDER_PROJECT, GUEST_FOLDER_PROJECT, owner: "www-data", group: "vagrant", mount_options:['dmode=777', 'fmode=777']
-#   config.vm.synced_folder HOST_FOLDER_PROJECT, GUEST_FOLDER_PROJECT, owner: "www-data", group: "www-data", mount_options:['dmode=777', 'fmode=777']
+  config.vm.synced_folder HOST_FOLDER_PROJECT, GUEST_FOLDER_PROJECT, owner: "vagrant", group: "www-data", mount_options:['dmode=775', 'fmode=775']
+  # config.vm.synced_folder HOST_FOLDER_PROJECT, GUEST_FOLDER_PROJECT, owner: "www-data", group: "vagrant", mount_options:['dmode=775', 'fmode=775']
   # config.vm.synced_folder HOST_FOLDER_PROJECT, GUEST_FOLDER_PROJECT, type: "nfs", mount_options: ['actimeo=2']
   # config.vm.synced_folder ".", "/vagrant", disabled: true
 

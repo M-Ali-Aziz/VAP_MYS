@@ -15,13 +15,3 @@
     name: Europe/Stockholm
   tags:
     - common
-
-- name: Install recommended modules, extensions & additional server software for Pimcore
-  become: yes
-  apt:
-    name:
-      - ffmpeg
-      - graphviz
-  tags:
-    - common
-    - pimcore

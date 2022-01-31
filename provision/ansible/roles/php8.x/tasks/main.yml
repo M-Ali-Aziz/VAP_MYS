@@ -1,0 +1,93 @@
+---
+- name: Add PHP 8.1 repository from PPA
+  become: yes
+  apt_repository:
+    repo: ppa:ondrej/php
+  tags:
+    - php8.x
+
+- name: Install PHP 8.1 packages
+  become: yes
+  apt:
+    name:
+      - php
+      - php-cli
+      - php-curl
+      - php-gd
+      - php-mbstring
+      - php-mysql
+      - php-odbc
+      - php-xml
+      - php-zip
+      - php-bz2
+      - php-intl
+      - php-apcu
+      - php-redis
+      - php-msgpack
+      - php-imagick
+      - php-pear
+    state: latest
+  notify: Restart Apache2
+  tags:
+    - php8.x
+
+- name: Set PHP 8.1 configuration in php.ini
+  become: yes
+  ini_file:
+    path: /etc/php/8.1/apache2/php.ini
+    section: "{{ item.section }}"
+    option: "{{ item.option }}"
+    value: "{{ item.value }}"
+  with_items:
+    - { section: PHP, option: memory_limit, value: 512M }
+    - { section: PHP, option: max_execution_time, value: 100M }
+    - { section: PHP, option: post_max_size, value: 100M }
+    - { section: Date, option: date.timezone, value: Europe/Stockholm }
+  notify: Restart Apache2
+  tags:
+    - php8.x
+
+- name: Install recommended PHP modules, extensions & additional SERVER software for Pimcore - part 1
+  become: yes
+  apt:
+    name:
+      - ffmpeg
+      - graphviz
+      - libreoffice
+      - libreoffice-script-provider-python
+      - libreoffice-math
+      - xfonts-75dpi
+      - poppler-utils
+      - inkscape
+      - libxrender1
+      - libfontconfig1
+      - ghostscript
+      - webp
+      - graphviz
+      - facedetect
+      - php-imagick
+      - imagemagick
+      - wkhtmltopdf
+      - exiftool
+  tags:
+    - php8.x
+    - pimcore
+
+- name: Install ZopfliPNG,PngCrush,JPEGOptim,PNGOut,AdvPNG,MozJPEG additional php/server modules/software for Pimcore - part 2
+  become: yes
+  get_url:
+    url: "{{ item.url }}"
+    dest: "{{ item.dest }}"
+    mode: 0755
+  with_items:
+    - { url: https://github.com/imagemin/zopflipng-bin/blob/main/vendor/linux/zopflipng, dest: /usr/local/bin/zopflipng }
+    - { url: https://github.com/imagemin/pngcrush-bin/blob/main/vendor/linux/pngcrush, dest: /usr/local/bin/pngcrush }
+    - { url: https://github.com/imagemin/jpegoptim-bin/blob/main/vendor/linux/jpegoptim, dest: /usr/local/bin/jpegoptim }
+    - { url: https://github.com/imagemin/pngout-bin/blob/main/vendor/linux/x64/pngout, dest: /usr/local/bin/pngout }
+    - { url: https://github.com/imagemin/advpng-bin/blob/main/vendor/linux/advpng, dest: /usr/local/bin/advpng }
+    - { url: https://github.com/imagemin/mozjpeg-bin/blob/main/vendor/linux/cjpeg, dest: /usr/local/bin/cjpeg }
+  register: getUrl
+  changed_when: no
+  tags:
+    - php8.x
+    - pimcore
